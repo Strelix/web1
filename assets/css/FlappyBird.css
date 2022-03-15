@@ -1,0 +1,119 @@
+canvas {
+  border:1px solid #d3d3d3;
+  background-color: #f1f1f1;
+}
+
+.side-text {
+  color: white;
+  margin-right: 50px;
+  text-shadow: 1px 1px 10px  white;
+  background-color: #1b1b1b;
+  padding: 20px 20px;
+  border-radius: 20px;
+}
+
+.YouLoseText {
+  color: rgb(255, 255, 255);
+  background-color: #1b1b1b;
+  padding: 6px 6px;
+  border-radius: 17px;
+  text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.603);
+  position: absolute;
+  left: 30px; 
+  top: 50px;
+  font-size: 30px;
+}
+
+.button {
+  cursor: pointer;
+  background-color: #1b1b1b;
+  color: white;
+  box-shadow: 2px 2px 5px rgba(34, 34, 34, 0.609);
+  position: absolute;
+  width: 200px;
+  height: 50px;
+  border-radius: 15px;
+}
+.accelerateButton {
+  top: 50px;
+  right: 200px;
+  width: 140px !important;
+}
+
+.restartButton {
+  top: 50px;
+  right: 40px;
+  width: 140px !important;
+}
+.changeSpritesColourButton {
+  top: 140px;
+  right: 140px;
+  width: 120px !important;
+}
+.changeObjectsColourButton {
+  top: 140px;
+  right: 270px;
+  width: 120px !important;
+}
+.changeScoreColourButton {
+  top: 140px;
+  right: 10px;
+  width: 120px !important;
+}
+.goBackButton {
+  top: 230px;
+  right: 100px;
+}
+
+.button:hover {
+  box-shadow: 0px 0px 15px rgb(34, 34, 34);
+}
+
+.bottom {
+  background-color: #1b1b1b;
+  position: absolute;
+  width: 942px;
+  height: 218px;
+  top: 550px;
+}
+
+.bottomText {
+  color: white;
+  padding: 0px 10px;
+  font-size: 20px;
+}
+b {
+  text-shadow: 1px 1px 5px white;
+}
+
+
+/* BUTTON LISTS */
+
+.spriteColourChange {
+  z-index: 50;
+  position: relative;
+  display: inline-block;
+}
+
+.dropdown-content {
+  z-index: 50;
+  display: none;
+  position: absolute;
+  right: 20px;
+  top: 400px;
+  color: white;
+  background-color: black;
+  width: 350px;
+  overflow: auto;
+  box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+}
+
+.dropdown-content a {
+  z-index: 50;
+  color: white;
+  padding: 12px 16px;
+  text-decoration: none;
+  display: block;
+}
+
+.show {display: block; z-index: 50;}

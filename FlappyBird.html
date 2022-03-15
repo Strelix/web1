@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <title>TEST</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <link rel="stylesheet" href="assets/css/FlappyBird.css">
+</head>
+
+<body onload="startGame()">
+    <!-- GAME -->
+    <script>
+        var myGamePiece;
+        var myObstacles = [];
+        var myScore;
+        var spriteColour = localStorage.getItem("spriteColour")
+        var objectsColour = localStorage.getItem("objectsColour")
+        var scoreColour = localStorage.getItem("scoreColour")
+        if (spriteColour === "random" || spriteColour === "Random"){
+            spriteColour = "#"+Math.floor(Math.random()*16777215).toString(16);
+        }
+
+        function changeSpritesColourFunction(colour){
+            localStorage.setItem("spriteColour", colour)
+            location.reload()
+            
+        }
+        function changeObjectsColourFunction(colour){
+            localStorage.setItem("objectsColour", colour)
+            location.reload()
+        }
+        function changeScoreColourColourFunction(colour){
+            localStorage.setItem("scoreColour", colour)
+            location.reload()
+        }
+        
+        function startGame() {
+            myGamePiece = new component(30, 30, spriteColour, 10, 120);
+            myGamePiece.gravity = 0.05;
+            myScore = new component("30px", "Consolas", scoreColour, 10, 30, "text");
+            myGameArea.start();
+        }
+        
+        var myGameArea = {
+            canvas : document.createElement("canvas"),
+            start : function() {
+                this.canvas.width = 960;
+                this.canvas.height = 540;
+                this.context = this.canvas.getContext("2d");
+                document.body.insertBefore(this.canvas, document.body.childNodes[0]);
+                this.frameNo = 0;
+                this.interval = setInterval(updateGameArea, 20);
+                },
+            clear : function() {
+                this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
+            }
+        }
+        
+        function component(width, height, color, x, y, type) {
+            this.type = type;
+            this.score = 0;
+            this.width = width;
+            this.height = height;
+            this.speedX = 0;
+            this.speedY = 0;    
+            this.x = x;
+            this.y = y;
+            this.gravity = 0;
+            this.gravitySpeed = 0;
+            this.update = function() {
+                ctx = myGameArea.context;
+                if (this.type == "text") {
+                    ctx.font = this.width + " " + this.height;
+                    ctx.fillStyle = color;
+                    ctx.fillText(this.text, this.x, this.y);
+                } else {
+                    ctx.fillStyle = color;
+                    ctx.fillRect(this.x, this.y, this.width, this.height);
+                }
+            }
+            this.newPos = function() {
+                this.gravitySpeed += this.gravity;
+                this.x += this.speedX;
+                this.y += this.speedY + this.gravitySpeed;
+                this.hitBottom();
+            }
+            this.hitBottom = function() {
+                var rockbottom = myGameArea.canvas.height - this.height;
+                var rocktop = myGameArea.canvas.height + this.height;
+                if (this.y > rockbottom) {
+                    this.y = rockbottom;
+                    this.gravitySpeed = 0;
+                } else{
+                if (this.y < 5) {
+			    this.y = 20;
+                this.gravitySpeed = 0;
+              }}
+            }
+
+            this.crashWith = function(otherobj) {
+                var myleft = this.x;
+                var myright = this.x + (this.width);
+                var mytop = this.y;
+                var mybottom = this.y + (this.height);
+                var otherleft = otherobj.x;
+                var otherright = otherobj.x + (otherobj.width);
+                var othertop = otherobj.y;
+                var otherbottom = otherobj.y + (otherobj.height);
+                var crash = true;
+                if ((mybottom < othertop) || (mytop > otherbottom) || (myright < otherleft) || (myleft > otherright)) {
+                    crash = false;
+                }
+                return crash;
+            }
+        }
+        
+        function updateGameArea() {
+            var x, height, gap, minHeight, maxHeight, minGap, maxGap;
+            for (i = 0; i < myObstacles.length; i += 1) {
+                if (myGamePiece.crashWith(myObstacles[i])) {
+                    return;
+                } 
+            }
+            myGameArea.clear();
+            myGameArea.frameNo += 1;
+            if (myGameArea.frameNo == 1 || everyinterval(150)) {
+                x = myGameArea.canvas.width;
+                minHeight = 20;
+                maxHeight = 200;
+                height = Math.floor(Math.random()*(maxHeight-minHeight+1)+minHeight);
+                minGap = 50;
+                maxGap = 200;
+                gap = Math.floor(Math.random()*(maxGap-minGap+1)+minGap);
+                myObstacles.push(new component(20, height, objectsColour, x, 0));
+                myObstacles.push(new component(20, x - height - gap, objectsColour, x, height + gap));
+            }
+            for (i = 0; i < myObstacles.length; i += 1) {
+                myObstacles[i].x += -1;
+                myObstacles[i].update();
+            }
+            myScore.text="SCORE: " + myGameArea.frameNo;
+            myScore.update();
+            myGamePiece.newPos();
+            myGamePiece.update();
+        }
+        
+        function everyinterval(n) {
+            if ((myGameArea.frameNo / n) % 1 == 0) {return true;}
+            return false;
+        }
+        
+        function accelerate(n) {
+            myGamePiece.gravity = n;
+        }
+        
+    </script>
+    <!-- OTHER -->
+    <script>
+        // ACCELERATE
+        function acc(amt){
+            if (amt === 1) {
+                accelerate(-0.2);
+            }
+            if (amt === 2){
+                accelerate(0.05);
+            }
+        }
+        // KEYBINDS
+        window.addEventListener('keydown', (event) => {
+            if (event.keyCode === 82) {
+                location.reload()
+            }
+            if (event.key === 'f') {
+                var doc = window.document;
+                var docEl = doc.documentElement;
+
+                var requestFullScreen = docEl.requestFullscreen || docEl.mozRequestFullScreen || docEl.webkitRequestFullScreen || docEl.msRequestFullscreen;
+                var cancelFullScreen = doc.exitFullscreen || doc.mozCancelFullScreen || doc.webkitExitFullscreen || doc.msExitFullscreen;
+
+                if(!doc.fullscreenElement && !doc.mozFullScreenElement && !doc.webkitFullscreenElement && !doc.msFullscreenElement) {
+                    requestFullScreen.call(docEl);
+                }
+                else {
+                    cancelFullScreen.call(doc);
+                }}
+                })
+
+        window.onkeydown = function(event){
+            if(event.keyCode === 32 ||  event.keyCode === 38) {
+                event.preventDefault();
+                acc(1)
+            }
+        };
+        window.onkeyup = function(event){
+            if(event.keyCode === 32 || event.keyCode === 38) {
+                event.preventDefault();
+                acc(2)
+            }
+        };
+        function fullScreen(){
+            var doc = window.document;
+            var docEl = doc.documentElement;
+            var requestFullScreen = docEl.requestFullscreen || docEl.mozRequestFullScreen || docEl.webkitRequestFullScreen || docEl.msRequestFullscreen;
+            requestFullScreen.call(docEl);
+        }
+
+       function spriteColourChange(){
+           
+            document.getElementById("myDropdown").classList.toggle("show");
+        }
+
+        function objectColourChange(){
+            
+            document.getElementById("myDropdown2").classList.toggle("show");
+        }
+        function scoreColourChange(){
+            document.getElementById("myDropdown3").classList.toggle("show");
+        }
+
+        window.onclick = function(event) {
+            if (event.target.matches('.changeSpritesColourButton')) {
+            } else if(event.target.matches('.changeObjectsColourButton')) {
+            } else if(event.target.matches('.changeScoreColourButton')) {
+            }else {
+                var dropdowns = document.getElementsByClassName("dropdown-content");
+                var i;
+                for (i = 0; i < dropdowns.length; i++) {
+                    var openDropdown = dropdowns[i];
+                    if (openDropdown.classList.contains('show')) {
+                        openDropdown.classList.remove('show');
+                        
+                    }
+                }
+             }
+            }
+            
+            //             if (!event.target.matches('.changeSpritesColourButton')) {
+                
+            //     var dropdowns = document.getElementsByClassName("dropdown-content");
+            //     var i;
+            //     for (i = 0; i < dropdowns.length; i++) {
+            //         var openDropdown = dropdowns[i];
+            //         if (openDropdown.classList.contains('show')) {
+            //             openDropdown.classList.remove('show');
+                        
+            //         }
+            //     }
+            //  }
+    </script>
+<br></br>
+    <button  class="button accelerateButton"          onmousedown="acc(1)"   onmouseup="acc(2)"                           >ACCELERATE</button>
+    <button  class="button goBackButton"              onclick="location.href = '../index.html'"                          >GO BACK</button>
+    <button  class="button restartButton"             onclick="location.reload()"                                        >RESTART</button>
+    <button  class="button changeSpritesColourButton" onclick="spriteColourChange()"   id="changeSpritesColourButton"    >SPRITE COLOUR</button>
+    <button  class="button changeObjectsColourButton" onclick="objectColourChange()"   id="changeObjectsColourButton"    >OBSTACALE COLOUR</button>
+    <button  class="button changeScoreColourButton"    onclick="scoreColourChange()"   id="changeScoreColourButton"      >SCORE COLOUR</button>
+    <div class="dropdown">
+        
+        <div class="dropdown">
+            <div id="myDropdown" class="dropdown-content">
+              <a onclick="changeSpritesColourFunction('red')">Red</a>
+              <a onclick="changeSpritesColourFunction('green')">Green</a>
+              <a onclick="changeSpritesColourFunction('blue')">Blue</a>
+              <a onclick="changeSpritesColourFunction('orange')">Orange</a>
+              <a onclick="changeSpritesColourFunction('purple')">Purple</a>
+              <a onclick="changeSpritesColourFunction('black')">Black</a>
+            </div>
+            <div id="myDropdown2" class="dropdown-content">
+                <a onclick="changeObjectsColourFunction('red')">Red</a>
+                <a onclick="changeObjectsColourFunction('green')">Green</a>
+                <a onclick="changeObjectsColourFunction('blue')">Blue</a>
+                <a onclick="changeObjectsColourFunction('orange')">Orange</a>
+                <a onclick="changeObjectsColourFunction('purple')">Purple</a>
+                <a onclick="changeObjectsColourFunction('black')">Black</a>
+            </div>
+            <div id="myDropdown3" class="dropdown-content">
+                <a onclick="changeScoreColourColourFunction('red')">Red</a>
+                <a onclick="changeScoreColourColourFunction('green')">Green</a>
+                <a onclick="changeScoreColourColourFunction('blue')">Blue</a>
+                <a onclick="changeScoreColourColourFunction('orange')">Orange</a>
+                <a onclick="changeScoreColourColourFunction('purple')">Purple</a>
+                <a onclick="changeScoreColourColourFunction('black')">Black</a>
+            </div>
+          </div>
+
+    <div class="bottom bottomText">
+        <p style="margin: 20px 10px;">
+            Press <b>'F'</b> to enter/leave fullscreen!             <br></br>
+            Press <b>'R'</b> to restart the game!                   <br></br>
+            The only thing here that was templated was the <b>canvas</b>!
+    
+    
+        </p>
+    </div>
+</body>
+</html>
+
